@@ -82,8 +82,8 @@ public class BasicBlock {
             case S:
                 blockList.add(new Block(4, 2, c));
                 blockList.add(new Block(5, 2, c));
-                blockList.add(new Block(6, 1, c));
                 blockList.add(new Block(5, 1, c));
+                blockList.add(new Block(6, 1, c));
 
                 leftF.add(blockList.get(0).leftP);
                 leftF.add(blockList.get(2).leftP);

@@ -11,6 +11,7 @@ public class Constants {
     public static final String BASIC_BLOCK_LEFT = "LEFT";
     public static final String BASIC_BLOCK_RIGHT = "RIGHT";
     public static final String GAME_FRAME_BORDER = "GAME_FRAME_BORDER";
+    public static final String GAME_FRAME_FIXED_BLOCK = "GAME_FRAME_FIXED_BLOCK";
    // 0-未生成，1-等待生成中，2-生成失败（游戏结束），3-已生成（新），4-可移动，5-已固定，6-已消除；
     public static final int BASIC_BLOCK_STATUS_NULL = 0;
     public static final int BASIC_BLOCK_STATUS_WAIT4CREATE = 1;

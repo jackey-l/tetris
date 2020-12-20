@@ -19,7 +19,7 @@ public class TetrisFrame extends Frame {
     public final static int GAME_FRAME_STATUS_SCORED = 4;
     public final static int GAME_FRAME_STATUS_GAMEOVER = 5;
 
-    public static int autoFallSpeed = 200;
+    public static int autoFallSpeed = 100;
 
 
     public static int ABX = 3;
@@ -41,6 +41,8 @@ public class TetrisFrame extends Frame {
 
     public List<Block> fixedBlocks = new ArrayList<>();
     Map<String, String> fixdPoint = new HashMap<>();
+
+    private Image offScreenImage = null;
 
     PaintThread paintThread;
     PaintMovingBlock paintMovingBlock;
@@ -65,8 +67,8 @@ public class TetrisFrame extends Frame {
 
         paintThread = new PaintThread();
         paintThread.start();
-        paintMovingBlock = new PaintMovingBlock();
-        paintMovingBlock.start();
+//        paintMovingBlock = new PaintMovingBlock();
+//        paintMovingBlock.start();
     }
 
     @Override
@@ -88,12 +90,13 @@ public class TetrisFrame extends Frame {
         for (int i = 1; i < 20; i++) {
             g.drawLine(GAME_FRAME_STARTX, GAME_FRAME_STARTY + BLOCK_SIZE * i, GAME_FRAME_STARTX + GAME_FRAME_WIDTH, GAME_FRAME_STARTY + BLOCK_SIZE * i);
         }
+
+        //画方块
+        movingBlocks.draw(g);
         //画固定方块
         for (Block fixedBlock : fixedBlocks) {
             fixedBlock.draw(g);
         }
-        //画方块
-        movingBlocks.draw(g);
 
 
     }
@@ -127,11 +130,19 @@ public class TetrisFrame extends Frame {
 //        return true;
     }
 
-    @Override
-    public void update(Graphics g) {
-//        System.out.println("update run " + new Date());
-        super.update(g);
-    }
+//    @Override
+//    public void update(Graphics g) {
+////        System.out.println("update run " + new Date());
+//        if(offScreenImage == null) {
+//            offScreenImage = this.createImage(MAIN_FRAME_WIDTH,MAIN_FRAME_HEIGHT);
+//            //这是游戏窗口的宽度和高度
+//        }
+//        Graphics gOff = offScreenImage.getGraphics();
+//        paint(gOff);
+//        g.drawImage(offScreenImage, 0, 0, null);
+//
+////        super.update(g);
+//    }
 
 
     class PaintThread extends Thread {
@@ -144,9 +155,9 @@ public class TetrisFrame extends Frame {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                fixedBlocks.add(new Block(1, 20, Color.RED));
-                fixedBlocks.add(new Block(2, 20, Color.RED));
-                fixedBlocks.add(new Block(3, 20, Color.RED));
+//                fixedBlocks.add(new Block(1, 20, Color.RED));
+//                fixedBlocks.add(new Block(2, 20, Color.RED));
+//                fixedBlocks.add(new Block(3, 20, Color.RED));
 
                 if (movingBlocks.status == Constants.BASIC_BLOCK_STATUS_NEW) {
                     movingBlocks.status = Constants.BASIC_BLOCK_STATUS_MOVABLE;
@@ -156,7 +167,7 @@ public class TetrisFrame extends Frame {
                 if (movingBlocks.status == Constants.BASIC_BLOCK_STATUS_FIXED) {
                     System.out.println("生成新方块~~~~~~~~~~~~~~~~~~~~~~~");
                     movingBlocks.regenerate();
-                    movingBlocks.status=Constants.BASIC_BLOCK_STATUS_NEW;
+                    movingBlocks.status = Constants.BASIC_BLOCK_STATUS_NEW;
                     if (1 == 2) { //TODO 游戏失败逻辑
                         System.out.println("======================================GAME OVER======================");
                     }
@@ -177,6 +188,20 @@ public class TetrisFrame extends Frame {
 //                    System.out.println("第"+i+"次下落后"+" 坐标为==="+movingBlocks.bottomF);
 //                    i++;
                 }
+
+                System.out.println(movingBlocks.bottomF);
+                Set<Map.Entry<String, String>> set = fixdPoint.entrySet();
+                Iterator<Map.Entry<String, String>> iterator = set.iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, String> next = iterator.next();
+                    if (next.getValue().equals(Constants.GAME_FRAME_FIXED_BLOCK)) {
+                        System.out.println(next.getKey() + "==============" + next.getValue());
+                    }
+                }
+                if (movingBlocks.bottomF.get(0).getY()>=17) {
+                    System.out.println("!!!!!!!!");
+                }
+//                System.out.println(fixdPoint);
                 movingBlocks.checkImpact(fixdPoint);
                 if (movingBlocks.impactMap.get(Constants.BASIC_BLOCK_BOTTOM)) {
                     System.out.println("移动方块触底啦！！！！！！！！！！");
@@ -184,6 +209,13 @@ public class TetrisFrame extends Frame {
 //                    score();
                     if (gameStatus != GAME_FRAME_STATUS_SCORED) {
                         fixedBlocks.addAll(movingBlocks.blockList);
+                        for (Block fixedBlock : fixedBlocks) {
+                            fixedBlock.refreshPoint();
+                            fixdPoint.putIfAbsent(fixedBlock.topP.toString(), Constants.GAME_FRAME_FIXED_BLOCK);
+                            fixdPoint.putIfAbsent(fixedBlock.BottomP.toString(), Constants.GAME_FRAME_FIXED_BLOCK);
+                            fixdPoint.putIfAbsent(fixedBlock.leftP.toString(), Constants.GAME_FRAME_FIXED_BLOCK);
+                            fixdPoint.putIfAbsent(fixedBlock.rightP.toString(), Constants.GAME_FRAME_FIXED_BLOCK);
+                        }
                         movingBlocks.status = Constants.BASIC_BLOCK_STATUS_FIXED;
                     }
 //                    movingBlocks.status = Constants.BASIC_BLOCK_STATUS_FIXED;
